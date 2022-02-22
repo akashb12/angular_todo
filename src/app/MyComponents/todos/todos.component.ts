@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Todo } from '../../Todo';
-
+import { TodoService } from 'src/app/service/todo.service';
 @Component({
   selector: 'app-todos',
   templateUrl: './todos.component.html',
@@ -8,7 +8,7 @@ import { Todo } from '../../Todo';
 })
 export class TodosComponent implements OnInit {
   todos: Todo[];
-  constructor() {
+  constructor(private todoService: TodoService) {
     this.todos = [
       // {
       //   title: 'test 1',
@@ -22,15 +22,34 @@ export class TodosComponent implements OnInit {
       // },
     ];
   }
+  getTodosData() {
+    this.todoService.getTodos().subscribe((res: any) => {
+      console.log('data', res?.get);
+      this.todos = res.get;
+    });
+  }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getTodosData();
+  }
   deleteTodo(todoData: Todo) {
-    const index = this.todos.indexOf(todoData);
-    if (this.todos.indexOf(todoData) !== -1) {
-      this.todos.splice(index, 1);
-    }
+    // console.log(todoData);
+    this.todoService.deleteTodo(todoData.id).subscribe((res) => {
+      const index = this.todos.indexOf(todoData);
+      if (this.todos.indexOf(todoData) !== -1) {
+        this.todos.splice(index, 1);
+      }
+    });
+    // const index = this.todos.indexOf(todoData);
+    // if (this.todos.indexOf(todoData) !== -1) {
+    //   this.todos.splice(index, 1);
+    // }
   }
   addTodo(todo: Todo) {
-    this.todos.push(todo);
+    // this.todos.push(todo);
+    this.todoService.addTodo(todo).subscribe((res: any) => {
+      console.log('data', res);
+      this.todos.push(res.create);
+    });
   }
 }
